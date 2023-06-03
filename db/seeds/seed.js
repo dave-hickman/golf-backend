@@ -1,7 +1,13 @@
 const format = require("pg-format");
 const db = require("../connection");
 
-const seed = ({ usersData, roundsData, coursesData, holesData, playerScoresData }) => {
+const seed = ({
+  usersData,
+  roundsData,
+  coursesData,
+  holesData,
+  playerScoresData,
+}) => {
   return db
     .query("DROP TABLE IF EXISTS courses")
     .then(() => {
@@ -70,19 +76,60 @@ const seed = ({ usersData, roundsData, coursesData, holesData, playerScoresData 
         `INSERT INTO users (username, handicap) VALUES %L;`,
         usersData.map(({ username, handicap }) => [username, handicap])
       );
-      const usersPromise = db.query(insertUsersQueryStr)
+      const usersPromise = db.query(insertUsersQueryStr);
 
-      return Promise.all([coursesPromise, usersPromise])
+      return Promise.all([coursesPromise, usersPromise]);
     })
     .then(() => {
-        const insertHolesQueryStr = format(
-            "INSERT into holes (course_name, course_id, par, stroke_index, hole_number) VALUES %L;",
-            holesData.map(({course_name, course_id, par, stroke_index, hole_number}) => [course_name, course_id, par, stroke_index, hole_number] )
+      const insertHolesQueryStr = format(
+        "INSERT into holes (course_name, course_id, par, stroke_index, hole_number) VALUES %L;",
+        holesData.map(
+          ({ course_name, course_id, par, stroke_index, hole_number }) => [
+            course_name,
+            course_id,
+            par,
+            stroke_index,
+            hole_number,
+          ]
         )
+      );
 
-        const insertRoundsQueryStr = format(
-            "INSERT into rounds (course_name, course_id) VALUES %L;",
-            roundsData.map(({course_name, course_id}) => [course_name, course_id])
-        )
+      const insertRoundsQueryStr = format(
+        "INSERT into rounds (course_name, course_id) VALUES %L;",
+        roundsData.map(({ course_name, course_id }) => [course_name, course_id])
+      );
+
+      return Promise.all([insertHolesQueryStr, insertRoundsQueryStr]);
     })
+    .then(() => {
+      const insertPlayerScore = format(
+        "INSERT into playerscore (round_id, course_id, course_name, user_id, username, hole_number, score, fairway, green) VALUES %L",
+        playerScoresData.map(
+          ({
+            round_id,
+            course_id,
+            course_name,
+            user_id,
+            username,
+            hole_number,
+            score,
+            fairway,
+            green,
+          }) => [
+            round_id,
+            course_id,
+            course_name,
+            user_id,
+            username,
+            hole_number,
+            score,
+            fairway,
+            green,
+          ]
+        )
+      );
+      return db.query(insertPlayerScore);
+    });
 };
+
+module.exports = seed;
