@@ -1,1 +1,1 @@
-module.exports = [{username: "Dave", handicap: 55}]
+module.exports = [{username: "Dave", handicap: 55}, {username: "Davros", handicap: 18}]

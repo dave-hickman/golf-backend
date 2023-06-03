@@ -1,3 +1,5 @@
 exports.coursesData= require('./courses.js')
-exports.roundsData= require('./courses.js')
-exports.usersData= require('./courses.js')
+exports.roundsData= require('./rounds.js')
+exports.usersData= require('./users.js')
+exports.holesData= require('./holes.js')
+exports.playerScoresData= require('./playerScores.js')
